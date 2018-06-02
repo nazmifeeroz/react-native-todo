@@ -9,14 +9,23 @@ import {
   View,
   ScrollView
 } from "react-native";
-import { LinearGradient } from "expo";
+import { AppLoading, LinearGradient } from "expo";
 import TodoList from "./components/TodoList";
 
 const { height, width } = Dimensions.get("window");
 
 export default class App extends React.Component {
   state = {
-    newTodoItem: ""
+    newTodoItem: "",
+    dataIsReady: false
+  };
+
+  componentDidMount = () => {
+    this.loadTodos();
+  };
+
+  loadTodos = () => {
+    this.setState({ dataIsReady: false });
   };
 
   newTodoItem = textValue => {
@@ -24,7 +33,23 @@ export default class App extends React.Component {
       newTodoItem: textValue
     });
   };
+
+  addTodo = () => {
+    if (this.state.newTodoItem !== "") {
+      this.setState({
+        // this will make the input field empty on clicking the done button
+        newTodoItem: ""
+      });
+    }
+  };
+
   render() {
+    const { newTodoItem, dataIsReady } = this.state;
+
+    if (!dataIsReady) {
+      return <AppLoading />;
+    }
+
     return (
       <LinearGradient style={styles.container} colors={["#DA4453", "#89216B"]}>
         <StatusBar barStyle="light-content" />
@@ -40,7 +65,7 @@ export default class App extends React.Component {
             autoCorrect={false}
           />
           <ScrollView>
-            <TodoList />
+            <TodoList textValue={this.state.newTodoItem} />
           </ScrollView>
         </View>
       </LinearGradient>
